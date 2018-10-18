@@ -1,9 +1,9 @@
 <template>
   <div>
-    <h1>Register</h1>
+    <h1>Signin</h1>
     <input type="text" name="username" placeholder="username" v-model="username"><br>
     <input type="password" name="password" placeholder="password" v-model="password"><br>
-    <button type="submit" @click="register">Register</button>
+    <button type="submit" @click="signin">Signin</button>
   </div>
 </template>
 
@@ -12,7 +12,8 @@ import { Component, Prop, Vue } from 'vue-property-decorator';
 import { setTimeout } from 'timers';
 
 @Component
-import AuthenticationService from '@/services/AuthenticationService'
+import AuthenticationService from '../services/AuthenticationService'
+import { constants } from 'http2';
 export default {
   data () {
     return {
@@ -21,8 +22,9 @@ export default {
     }
   },
   methods: {
-    async register () {
-      const response = await AuthenticationService.register({
+    async signin () {
+      console.log('yeah')
+      const response = await AuthenticationService.signin({
         username: this.username,
         password: this.password
       })

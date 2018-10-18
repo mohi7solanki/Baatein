@@ -1,7 +1,8 @@
-import Vue from 'vue';
-import Router from 'vue-router';
-import Home from './views/Home.vue';
-import Register from '@/components/Register';
+import Vue from 'vue'
+import Router from 'vue-router'
+import Home from './views/Home.vue'
+import Register from '@/components/Register'
+import Signin from '@/components/Signin'
 
 Vue.use(Router);
 
@@ -26,6 +27,11 @@ export default new Router({
       path: '/register',
       name: 'register',
       component: Register,
+    },
+    {
+      path: '/signin',
+      name: 'signin',
+      component: Signin
     }
   ],
 });
