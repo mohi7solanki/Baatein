@@ -2,7 +2,7 @@
   <div class="page-container">
     <md-app>
       <md-app-toolbar class="md-primary">
-        <span class="md-title">Postman Chat</span>
+        <span class="md-title">{{  talkingUser.username  }}</span>
       </md-app-toolbar>
 
       <md-app-drawer md-permanent="full">
@@ -15,7 +15,7 @@
         </md-toolbar>
 
         <md-list v-for="user in filteredUsers">
-          <md-list-item>
+          <md-list-item @click="changeTalkingUser(user)" :class="{active:user._id===talkingUser._id,unread:user.unread}">
             <md-icon>account_circle</md-icon>
             <span class="md-list-item-text">{{ user.username }}</span>
           </md-list-item>
@@ -23,8 +23,13 @@
       </md-app-drawer>
 
       <md-app-content>
-        <div v-for="message in messageList" class="md-layout md-alignment-bottom-right">
-          <div class="message-border">{{ message }}</div>
+        <div v-for="message in messageList">
+          <div class="md-layout md-alignment-bottom-left" v-if="message.from==talkingUser._id" style="margin-bottom:10px">
+            <div class="message-border" >{{ message.data }}</div>
+          </div>
+          <div class="md-layout md-alignment-bottom-right" v-if="message.from!=talkingUser._id" style="margin-bottom:10px">
+            <div class="message-border" >{{ message.data }}</div>
+          </div>
         </div>
         <div class="input-msg">
           <md-field>
@@ -32,7 +37,7 @@
             <md-textarea v-model="message"></md-textarea>
           </md-field>
           <div class="md-layout md-alignment-bottom-right">
-             <md-button class="md-raised md-primary" @click="sendMessage(message)">Send message</md-button>
+             <md-button class="md-raised md-primary" @click="sendMessage(message);message=''">Send message</md-button>
           </div>
         </div>
       </md-app-content>
@@ -42,21 +47,25 @@
 
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator';
-import { setTimeout } from 'timers';
 
-@Component
-import { MdApp } from '../../node_modules/vue-material/dist/components'
+
 import AuthenticationService from '../services/AuthenticationService'
 import UserService from '../services/UserService'
+import MessageService from '../services/MessageService'
 import { constants } from 'http2';
+import io from 'socket.io-client/dist/socket.io'
+
 export default {
   data () {
     return {
       users: [],
+      usersmsg: {},
       searchText: '',
       currentUser : [],
       messageList: [],
-      message: ''
+      message: '',
+      talkingUser: '',
+      socket: ''
     }
   },
   methods: {
@@ -64,10 +73,12 @@ export default {
       try {
         const response = await UserService.getAllUsers()
         response['data'].forEach(user => {
-          if(this.currentUser.data._id !== user._id) {
+          if(this.currentUser._id !== user._id) {
+            user.unread = false
             this.users.push(user)
           }
         })
+        
       } catch (err) {
         console.log(err)
       }
@@ -75,18 +86,94 @@ export default {
     isUserLoggedin: function () {
       UserService.isLoggedin()
       .then (function (resp) {
-        this.currentUser = resp
+        this.currentUser = resp.data
+        console.log(this.currentUser)
       }.bind(this),
       function (resp) {
         this.$router.push({name: 'signin'})
       }.bind(this))
     },
     sendMessage: function (message) {
-      this.messageList.push(message)
+      MessageService.sendMessage(this.talkingUser._id, message)
+      .then (function (resp) {
+        this.usersmsg[this.talkingUser._id].push(resp.data)
+        this.messageList = this.usersmsg[this.talkingUser._id]
+      }.bind(this))
+      .catch(e => {
+        console.log(e)
+      })
+    },
+    changeTalkingUser(user) {
+      if (!(user._id in this.usersmsg)) {
+        console.log(1)
+        MessageService.retrieveMessage(user._id)
+        .then (function (resp) {
+          this.usersmsg[user._id] = resp.data
+          this.messageList = resp.data
+          this.talkingUser = user
+          for(var i=0; i< this.users.length; i++){
+            if(this.users[i]._id == user._id){
+              this.users[i].unread = false
+              break
+            }
+          }
+        }.bind(this))
+        .catch(e => {
+          console.log(e)
+        })
+      }
+      else {
+        console.log(2)
+        this.messageList = this.usersmsg[user._id]
+        this.talkingUser = user
+        for(var i=0; i< this.users.length; i++){
+          if(this.users[i]._id == user._id){
+            this.users[i].unread = false
+            break
+          }
+        }
+      }
+    },
+    connectsocket(){
+      console.log('connect')
+      this.socket = io('http://localhost:4000')
+      this.socket.on('connect', function(){
+        console.log('connect')
+      });
+      this.socket.on('new-message', function(data){
+        console.log(data)
+        var convWith = data.from;
+        if (this.usersmsg[convWith]) {
+          this.usersmsg[convWith].push(data)
+          if (this.talkingUser._id==convWith) {
+            this.messageList = this.usersmsg[convWith]
+          }
+          else{
+            for(var i=0; i< this.users.length; i++){
+              if(this.users[i]._id == convWith){
+                this.users[i].unread = true
+                break
+              }
+            }
+          }
+        }
+        else{
+          for(var i=0; i< this.users.length; i++){
+            if(this.users[i]._id == convWith){
+              this.users[i].unread = true
+              break
+            }
+          }
+        }
+      }.bind(this));
+      // this.socket.emit('login', 'wfwrefrf', (data) => {
+      //   console.log(data); // data will be 'woot'
+      // });
     }
   },
   mounted() {
     this.getUsers()
+    this.connectsocket()
   },
   computed: {
     filteredUsers: function() {
@@ -94,6 +181,7 @@ export default {
       return this.users.filter(function (user) {
         return user.username.match(this.searchText)
       }.bind(this))
+
     }
   },
   beforeMount() {
@@ -126,5 +214,11 @@ export default {
     padding: 5px;
     background-color: lightgray;
     color: black;
+  }
+  .active {
+    background-color: lightgray;
+  }
+  .unread {
+    background-color: green;
   }
 </style>
