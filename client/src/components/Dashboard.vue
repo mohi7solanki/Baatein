@@ -17,14 +17,14 @@
         <md-list v-for="user in filteredUsers">
           <md-list-item>
             <md-icon>account_circle</md-icon>
-            <span class="md-list-item-text">{{ user.username }}</span>
+            <span class="md-list-item-text" @click="changeTalkingUser( {{ user._id  }} )">{{ user.username }}</span>
           </md-list-item>
         </md-list>
       </md-app-drawer>
 
       <md-app-content>
         <div v-for="message in messageList" class="md-layout md-alignment-bottom-right">
-          <div class="message-border">{{ message }}</div>
+          <div class="message-border">{{ message.data }}</div>
         </div>
         <div class="input-msg">
           <md-field>
@@ -42,12 +42,11 @@
 
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator';
-import { setTimeout } from 'timers';
 
-@Component
-import { MdApp } from '../../node_modules/vue-material/dist/components'
+
 import AuthenticationService from '../services/AuthenticationService'
 import UserService from '../services/UserService'
+import MessageService from '../services/MessageService'
 import { constants } from 'http2';
 export default {
   data () {
@@ -56,7 +55,8 @@ export default {
       searchText: '',
       currentUser : [],
       messageList: [],
-      message: ''
+      message: '',
+      talkingUser: ''
     }
   },
   methods: {
@@ -82,7 +82,16 @@ export default {
       }.bind(this))
     },
     sendMessage: function (message) {
-      this.messageList.push(message)
+      MessageService.sendMessage(this.talkingUser, message)
+      .then (function (resp) {
+        this.messageList.push(resp)
+      })
+      .catch(e => {
+        console.log(e)
+      })
+    },
+    changeTalkingUser(id) {
+      this.talkingUser = id
     }
   },
   mounted() {
