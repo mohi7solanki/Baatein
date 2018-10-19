@@ -3,6 +3,7 @@ import Router from 'vue-router'
 import Home from './views/Home.vue'
 import Register from '@/components/Register'
 import Signin from '@/components/Signin'
+import Dashboard from '@/components/Dashboard'
 
 Vue.use(Router);
 
@@ -32,6 +33,11 @@ export default new Router({
       path: '/signin',
       name: 'signin',
       component: Signin
+    },
+    {
+      path: '/user/:username',
+      name: 'userDash',
+      component: Dashboard
     }
   ],
 });

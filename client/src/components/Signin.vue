@@ -22,13 +22,17 @@ export default {
     }
   },
   methods: {
-    async signin () {
-      console.log('yeah')
-      const response = await AuthenticationService.signin({
+    signin () {
+      AuthenticationService.signin({
         username: this.username,
         password: this.password
       })
-      console.log(response.data)
+      .then( function (resp) {
+        console.log('andar')
+        this.$router.push({name: 'userDash', params: {username: this.username}})
+      }.bind(this), function (resp) {
+        console.log('galat')
+      })
     }
   }
 }

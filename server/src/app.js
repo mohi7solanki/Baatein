@@ -3,7 +3,7 @@ const bodyParser = require('body-parser')
 // const cors = require('cors')
 const morgan = require('morgan')
 const mongoose = require('mongoose')
-const register = require('./routes/user')
+const user = require('./routes/user')
 const session = require('express-session')
 const app = express()
 let MemoryStore = session.MemoryStore
@@ -25,7 +25,8 @@ app.use(function (req, res, next) {
   next()
 })
 // app.use(cors())
-app.use('/user', register)
+app.use('/user', user)
+app.use('/users', user)
 
 mongoose.Promise = global.Promise
 

@@ -5,7 +5,11 @@ export default {
     return Api().post('user/register', credentials)
   },
   signin (credentials) {
-    return Api().post('user/signin', credentials)
+    return Api()
+    .post('user/signin', credentials)
+    .then(function (resp) {
+      return resp
+    })
   }
 }
 
