@@ -2,7 +2,20 @@
   <div class="page-container">
     <md-app>
       <md-app-toolbar class="md-primary">
-        <span class="md-title">{{  talkingUser.username  }}</span>
+        <!-- <span class="md-title" v-if="talkingUser === ''">Baatein Etihaas</span>
+        <span class="md-title" v-if="talkingUser !== ''">Baatein Etihaas - {{ talkingUser.username }}</span>
+        <div class="md-layout md-gutter md-alignment-center-right">
+          <md-button class="">asdasd</md-button>
+        </div> -->
+        <div class="md-toolbar-row">
+          <div class="md-toolbar-section-start">
+            <span class="md-title" v-if="talkingUser === ''">Baatein Etihaas</span>
+            <span class="md-title" v-if="talkingUser !== ''">Baatein Etihaas - {{ talkingUser.username }}</span>
+          </div>
+          <div class="md-toolbar-section-end">
+            <md-button class="md-raised" @click="logout">Logout</md-button>
+          </div>
+        </div>
       </md-app-toolbar>
 
       <md-app-drawer md-permanent="full">
@@ -15,33 +28,48 @@
         </md-toolbar>
 
         <md-list v-for="user in filteredUsers">
-          <md-list-item @click="changeTalkingUser(user)" :class="{active:user._id===talkingUser._id,unread:user.unread}">
+          <md-list-item @click="changeTalkingUser(user)" :class="{active:user._id===talkingUser._id}">
             <md-icon>account_circle</md-icon>
             <span class="md-list-item-text">{{ user.username }}</span>
+            <md-badge v-if="user.unread" class="md-square badge" md-content="NEW" />
           </md-list-item>
         </md-list>
       </md-app-drawer>
 
       <md-app-content>
-        <div v-for="message in messageList">
-          <div class="md-layout md-alignment-bottom-left" v-if="message.from==talkingUser._id" style="margin-bottom:10px">
-            <div class="message-border" >{{ message.data }}</div>
-          </div>
-          <div class="md-layout md-alignment-bottom-right" v-if="message.from!=talkingUser._id" style="margin-bottom:10px">
-            <div class="message-border" >{{ message.data }}</div>
+        <div v-if="talkingUser === ''">
+          <div class="welcome-card">
+            <h2>Welcome to Baatein <md-icon>chat</md-icon></h2>
+            <h4>A world full of gossips</h4>
+            <p>Search for a friend and just start your bak-bak!!</p>
           </div>
         </div>
-        <div class="input-msg">
-          <md-field>
-            <label>Enter your message here</label>
-            <md-textarea v-model="message"></md-textarea>
-          </md-field>
-          <div class="md-layout md-alignment-bottom-right">
-             <md-button class="md-raised md-primary" @click="sendMessage(message);message=''">Send message</md-button>
+        <div v-if="talkingUser !== ''">
+          <div class="msg-list">
+            <div v-for="message in messageList">
+              <div class="md-layout md-alignment-bottom-left padding left" v-if="message.from==talkingUser._id">
+                <div class="message-border message-conf received">{{ message.data }}</div>
+              </div>
+              <div class="md-layout md-alignment-bottom-right padding right" style="padding-right:40px" v-if="message.from!=talkingUser._id">
+                <div class="message-border message-conf sent" >{{ message.data }}</div>
+              </div>
+            </div>
+          </div>
+          <div class="input-msg">
+            <md-field>
+              <label>Enter your message here</label>
+              <md-textarea v-model="message"></md-textarea>
+            </md-field>
+            <div class="md-layout md-alignment-bottom-right">
+              <md-button class="md-raised md-primary" @click="sendMessage(message);message=''">Send message</md-button>
+            </div>
           </div>
         </div>
       </md-app-content>
     </md-app>
+    <md-snackbar :md-position="position" :md-duration="isInfinity ? Infinity : duration" :md-active.sync="showSnackbar" md-persistent>
+      <span>{{ snackbarMessage }}</span>
+    </md-snackbar>
   </div>
 </template>
 
@@ -65,7 +93,12 @@ export default {
       messageList: [],
       message: '',
       talkingUser: '',
-      socket: ''
+      socket: '',
+      showSnackbar: false,
+      position: 'left',
+      duration: 4000,
+      isInfinity: false,
+      snackbarMessage: ''
     }
   },
   methods: {
@@ -169,6 +202,19 @@ export default {
       // this.socket.emit('login', 'wfwrefrf', (data) => {
       //   console.log(data); // data will be 'woot'
       // });
+    },
+    logout () {
+      AuthenticationService.logout()
+        .then(function (resp) {
+          this.showSnackbar = true
+          this.snackbarMessage = 'Logout Sucessful'
+          setTimeout(function(){
+            this.$router.push({name: 'signin'})
+          }.bind(this), 1000)
+        }.bind(this), function (resp) {
+          this.showSnackbar = true
+          this.snackbarMessage = 'Logout Unsucessful'
+        }.bind(this))
     }
   },
   mounted() {
@@ -192,33 +238,84 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="less">
+  // .full-page {
+  //   max-height: 100%;
+  // }
+  .page-container {
+    padding: 70px;
+    background: linear-gradient(grey, yellow);
+  }
   .md-app {
-    max-height: 1000px;
     border: 1px solid rgba(#000, .12);
   }
-
+  .md-app-toolbar {
+    background-color: darkkhaki !important;
+  }
    // Demo purposes only
   .md-drawer {
-    width: 230px;
+    width: 375px;
     max-width: calc(100vw - 125px);
   }
-
-  // .input-msg {
-  //   position: fixed;
-  //   bottom: 0;
-  //   width: 100%;
+  .md-content {
+    background-image: url('../../public/img/leaves.png')
+  }
+  .input-msg {
+    position: fixed;
+    bottom: 0;
+    width: 98%;
+  }
+  .md-field {
+    background-color: white !important;
+  }
+  // .sent-message-conf {
+  //   margin-bottom:10px;
+  //   background-color: rgb(212, 255, 196);
   // }
+  .message-conf {
+    &.sent {
+      margin-bottom:10px;
+      background-color: rgb(212, 255, 196);
+    }
+    &.received {
+      margin-bottom:10px;
+      background-color: lightblue;
+    }
+  }
   .message-border {
-    border: 1px solid grey;
     border-radius: 10px;
-    padding: 5px;
-    background-color: lightgray;
+    padding: 8px 15px 8px 15px;
     color: black;
   }
   .active {
     background-color: lightgray;
   }
-  .unread {
-    background-color: green;
+  .welcome-card {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    -webkit-transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%);
+    border: 1px solid lightgray;
+    padding: 100px;
+    border-radius: 10px;
+    background-color: snow;
   }
+
+  .badge {
+    background-color: greenyellow;
+  }
+
+  .msg-list {
+    height: 500px;
+    overflow-y: auto;
+  }
+
+  .padding {
+    &.left {
+      padding-left: 40px;
+    }
+    &.right {
+      padding-right: 40px;
+    }
+  } 
 </style>

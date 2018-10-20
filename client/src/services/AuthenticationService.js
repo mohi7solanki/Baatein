@@ -10,6 +10,12 @@ export default {
     .then(function (resp) {
       return resp
     })
+  },
+  logout () {
+    return Api().get('user/logout')
+      .then (function (resp) {
+        return resp
+      })
   }
 }
 

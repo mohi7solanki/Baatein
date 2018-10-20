@@ -9,7 +9,8 @@ var Message = require('./models/Message.js')
 const session = require('express-session')({
   secret: 'my-secret',
   resave: true,
-  saveUninitialized: true
+  saveUninitialized: true,
+  expires: new Date(Date.now() + 120000)
 })
 const app = express()
 var sharedsession = require('express-socket.io-session')
@@ -62,6 +63,7 @@ app.post('/send/:to', function (req, res, next) {
   })
   var sess = req.session
   if (!sess.user) {
+    res.status(400)
     res.json('Please Login First')
     return
   }

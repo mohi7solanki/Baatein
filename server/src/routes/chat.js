@@ -7,6 +7,7 @@ var Message = require('../models/Message.js')
 router.get('/show/:pb', function (req, res, next) {
   var sess = req.session
   if (!sess.user) {
+    res.status(400)
     res.json('Please Login First')
     return
   }

@@ -1,9 +1,31 @@
 <template>
   <div>
-    <h1>Register</h1>
-    <input type="text" name="username" placeholder="username" v-model="username"><br>
-    <input type="password" name="password" placeholder="password" v-model="password"><br>
-    <button type="submit" @click="register">Register</button>
+    <div class="md-layout md-gutter md-alignment-center-center register-div">
+      <md-card class="register-card" md-with-hover>
+        <md-card-header>
+          <div class="md-title"><md-icon>chat</md-icon> Baatein - Register</div>
+          <div class="md-subhead">Not like slack though :(</div>
+        </md-card-header>
+
+        <md-card-content>
+          <md-field>
+            <label>Username</label>
+            <md-input v-model="username"></md-input>
+          </md-field>
+          <md-field>
+            <label>Password</label>
+            <md-input v-model="password" type="password"></md-input>
+          </md-field>
+        </md-card-content>
+        <hr>
+        <md-card-actions>
+          <md-button @click="register">Register</md-button>
+        </md-card-actions>
+      </md-card>
+    </div>
+    <md-snackbar :md-position="position" :md-duration="isInfinity ? Infinity : duration" :md-active.sync="showSnackbar" md-persistent>
+      <span>{{ snackbarMessage }}</span>
+    </md-snackbar>
   </div>
 </template>
 
@@ -17,16 +39,45 @@ export default {
   data () {
     return {
       username: '',
-      password: ''
+      password: '',
+      showSnackbar: false,
+      position: 'left',
+      duration: 4000,
+      isInfinity: false,
+      snackbarMessage: ''
     }
   },
   methods: {
     async register () {
-      const response = await AuthenticationService.register({
-        username: this.username,
-        password: this.password
-      })
-      console.log(response.data)
+      if (this.username==='' && this.password === '') {
+        this.showSnackbar = true
+        this.snackbarMessage = 'Username and password can\'t be left empty' 
+      }
+      else if (this.password === '') {
+        this.showSnackbar = true
+        this.snackbarMessage = 'Password can\'t be left empty'
+      }
+      else if (this.username === '') {
+        this.showSnackbar = true
+        this.snackbarMessage = 'Username can\'t be left empty'
+      }
+      else {
+        const response = await AuthenticationService.register({
+          username: this.username,
+          password: this.password
+        })
+        if(response.status === 200) {
+          this.showSnackbar = true
+          this.snackbarMessage = 'Registered successfully'
+          setTimeout(function(){
+              this.$router.push({name: 'signin'})
+          }.bind(this), 1000)
+        } 
+        else {
+          this.showSnackbar = true
+          this.snackbarMessage = 'There was some error while registering'
+        }
+      }
     }
   }
 }
@@ -34,5 +85,10 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="less">
-
+  .register-div {
+    margin-top: 5%;
+  }
+  .register-card {
+    min-width: 400px;
+  }
 </style>
