@@ -1,6 +1,6 @@
 <template>
   <div class="page-container full-page">
-    <md-app>
+    <md-app class="full-page">
       <md-app-toolbar class="md-primary">
         <div class="md-toolbar-row">
           <div class="md-toolbar-section-start">
@@ -242,8 +242,7 @@ export default {
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="less">
   .full-page {
-    min-height: 772px;
-    max-height: 772px;
+    height: 100%
   }
   .page-container {
     padding: 70px;
@@ -251,8 +250,7 @@ export default {
   }
   .md-app {
     border: 1px solid rgba(#000, .12);
-    min-height: 640px;
-    max-height: 640px;
+
   }
   .md-app-toolbar {
     background-color: darkkhaki !important;
@@ -266,11 +264,12 @@ export default {
   }
   .input-msg {
     position: fixed;
-    bottom: 0;
-    width: 98%;
+    bottom: 16px;
+    width: calc(100% - 32px);
   }
   .md-field {
     background-color: white !important;
+    margin-bottom: 4px;
   }
   .message-conf {
     &.sent {
@@ -307,7 +306,7 @@ export default {
   }
 
   .msg-list {
-    height: 350px;
+    height: 260px;
     overflow-y: auto;
   }
 

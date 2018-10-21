@@ -26,4 +26,7 @@
     }
   }
 }
+body,#app{
+  height: 100%;
+}
 </style>
