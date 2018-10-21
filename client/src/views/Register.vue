@@ -48,16 +48,17 @@ export default {
     }
   },
   methods: {
+    // Action on calling register function
     async register () {
-      if (this.username==='' && this.password === '') {
+      if (this.username==='' && this.password === '') { // if username and password is empty
         this.showSnackbar = true
         this.snackbarMessage = 'Username and password can\'t be left empty' 
       }
-      else if (this.password === '') {
+      else if (this.password === '') { // if username is empty
         this.showSnackbar = true
         this.snackbarMessage = 'Password can\'t be left empty'
       }
-      else if (this.username === '') {
+      else if (this.username === '') { // if password is empty
         this.showSnackbar = true
         this.snackbarMessage = 'Username can\'t be left empty'
       }
@@ -66,14 +67,14 @@ export default {
           username: this.username,
           password: this.password
         })
-        if(response.status === 200) {
+        if(response.status === 200) { // Success
           this.showSnackbar = true
           this.snackbarMessage = 'Registered successfully'
           setTimeout(function(){
               this.$router.push({name: 'signin'})
           }.bind(this), 1000)
         } 
-        else {
+        else { // failure
           this.showSnackbar = true
           this.snackbarMessage = 'There was some error while registering'
         }

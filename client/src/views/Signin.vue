@@ -1,9 +1,5 @@
 <template>
   <div>
-    <!-- <h1>Signin</h1>
-    <input type="text" name="username" placeholder="username" v-model="username"><br>
-    <input type="password" name="password" placeholder="password" v-model="password"><br>
-    <button type="submit" @click="signin">Signin</button> -->
     <div class="md-layout md-gutter md-alignment-center-center signin-div">
       <md-card class="signin-card" md-with-hover>
         <md-card-header>
@@ -54,6 +50,7 @@ export default {
     }
   },
   methods: {
+    // Action on calling login function
     login () {
       AuthenticationService.signin({
         username: this.username,

@@ -1,7 +1,8 @@
 var express = require('express')
 var router = express.Router()
 var User = require('../models/User')
-/* GET ALL CHATS */
+
+// Register request
 router.post('/register', function (req, res, next) {
   let username = req.body.username
   let password = req.body.password
@@ -16,8 +17,9 @@ router.post('/register', function (req, res, next) {
     } else res.json(temp)
   })
 })
+
+// Signin request
 router.post('/signin', function (req, res, next) {
-  console.log('signin')
   let sess = req.session
   let username = req.body.username
   let password = req.body.password
@@ -36,6 +38,8 @@ router.post('/signin', function (req, res, next) {
     }
   })
 })
+
+// Logout request
 router.get('/logout', function (req, res) {
   var sess = req.session
   console.log(sess)
@@ -51,6 +55,8 @@ router.get('/logout', function (req, res) {
     }
   })
 })
+
+// Check if a user is still logeedin
 router.get('/isloggedin', function (req, res, next) {
   let sess = req.session
   // res.json(sess)
@@ -61,6 +67,7 @@ router.get('/isloggedin', function (req, res, next) {
   } else res.send(sess.user)
 })
 
+// Get all users
 router.get('/', function (req, res, next) {
   User.find({}, function (err, users) {
     let userMap = []
@@ -72,30 +79,5 @@ router.get('/', function (req, res, next) {
     console.log(err)
   })
 })
-// router.get('/', function(req, res, next) {
-//     username = req.param.username;
-//     password = req.param.password;
-//     User.find({},function(err, users){
-//         if (err) return next(err);
-//         res.json(users);
-//     });
-// });
-// router.get('/find/:uname', function(req, res, next) {
-//     username = req.params.uname;
-//     User.findOne({username:username},function(err, user){
-//         if (err) return next(err);
-//         res.json(user);
-//     });
-// });
-// router.get('/logout',function(req,res){
-//     var sess = req.session;
-//     if(!sess.user){res.json("Please Login First");return;}
-//     req.session.destroy(function(err) {
-//         if(err) {
-//             console.log(err);
-//         } else {
-//             res.json("Logout Success");
-//         }
-//     });
-// });
+
 module.exports = router

@@ -1,12 +1,7 @@
 <template>
-  <div class="page-container">
+  <div class="page-container full-page">
     <md-app>
       <md-app-toolbar class="md-primary">
-        <!-- <span class="md-title" v-if="talkingUser === ''">Baatein Etihaas</span>
-        <span class="md-title" v-if="talkingUser !== ''">Baatein Etihaas - {{ talkingUser.username }}</span>
-        <div class="md-layout md-gutter md-alignment-center-right">
-          <md-button class="">asdasd</md-button>
-        </div> -->
         <div class="md-toolbar-row">
           <div class="md-toolbar-section-start">
             <span class="md-title" v-if="talkingUser === ''">Baatein Etihaas</span>
@@ -102,6 +97,7 @@ export default {
     }
   },
   methods: {
+    // Get all users registered on baatein
     async getUsers () {
       try {
         const response = await UserService.getAllUsers()
@@ -113,32 +109,38 @@ export default {
         })
         
       } catch (err) {
-        console.log(err)
+        this.showSnackbar = true
+        this.snackbarMessage = err
       }
     },
+
+    // Check if current user is logged in 
     isUserLoggedin: function () {
       UserService.isLoggedin()
       .then (function (resp) {
         this.currentUser = resp.data
-        console.log(this.currentUser)
       }.bind(this),
       function (resp) {
         this.$router.push({name: 'signin'})
       }.bind(this))
     },
+
+    // Action on sending a message
     sendMessage: function (message) {
       MessageService.sendMessage(this.talkingUser._id, message)
       .then (function (resp) {
         this.usersmsg[this.talkingUser._id].push(resp.data)
         this.messageList = this.usersmsg[this.talkingUser._id]
       }.bind(this))
-      .catch(e => {
-        console.log(e)
+      .catch(function (err) {
+        this.showSnackbar = true
+        this.snackbarMessage = err
       })
     },
+
+    // When a user changes from a user to a different user to talk
     changeTalkingUser(user) {
       if (!(user._id in this.usersmsg)) {
-        console.log(1)
         MessageService.retrieveMessage(user._id)
         .then (function (resp) {
           this.usersmsg[user._id] = resp.data
@@ -151,12 +153,12 @@ export default {
             }
           }
         }.bind(this))
-        .catch(e => {
-          console.log(e)
+        .catch(function (err) {
+          this.showSnackbar = true
+          this.snackbarMessage = err
         })
       }
       else {
-        console.log(2)
         this.messageList = this.usersmsg[user._id]
         this.talkingUser = user
         for(var i=0; i< this.users.length; i++){
@@ -167,14 +169,14 @@ export default {
         }
       }
     },
+
+    // Socket connection initialization on opening a chat window
     connectsocket(){
-      console.log('connect')
       this.socket = io('http://localhost:4000')
       this.socket.on('connect', function(){
         console.log('connect')
       });
       this.socket.on('new-message', function(data){
-        console.log(data)
         var convWith = data.from;
         if (this.usersmsg[convWith]) {
           this.usersmsg[convWith].push(data)
@@ -199,10 +201,9 @@ export default {
           }
         }
       }.bind(this));
-      // this.socket.emit('login', 'wfwrefrf', (data) => {
-      //   console.log(data); // data will be 'woot'
-      // });
     },
+
+    // Action on logging out from a session
     logout () {
       AuthenticationService.logout()
         .then(function (resp) {
@@ -222,6 +223,7 @@ export default {
     this.connectsocket()
   },
   computed: {
+    // Search filter implemented
     filteredUsers: function() {
       var self = this.users
       return this.users.filter(function (user) {
@@ -231,6 +233,7 @@ export default {
     }
   },
   beforeMount() {
+    // Check unauthorized access to url
     this.isUserLoggedin()
   }
 }
@@ -238,20 +241,22 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="less">
-  // .full-page {
-  //   max-height: 100%;
-  // }
+  .full-page {
+    min-height: 772px;
+    max-height: 772px;
+  }
   .page-container {
     padding: 70px;
     background: linear-gradient(grey, yellow);
   }
   .md-app {
     border: 1px solid rgba(#000, .12);
+    min-height: 640px;
+    max-height: 640px;
   }
   .md-app-toolbar {
     background-color: darkkhaki !important;
   }
-   // Demo purposes only
   .md-drawer {
     width: 375px;
     max-width: calc(100vw - 125px);
@@ -267,10 +272,6 @@ export default {
   .md-field {
     background-color: white !important;
   }
-  // .sent-message-conf {
-  //   margin-bottom:10px;
-  //   background-color: rgb(212, 255, 196);
-  // }
   .message-conf {
     &.sent {
       margin-bottom:10px;
@@ -306,7 +307,7 @@ export default {
   }
 
   .msg-list {
-    height: 500px;
+    height: 350px;
     overflow-y: auto;
   }
 
