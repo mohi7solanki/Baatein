@@ -31,12 +31,9 @@
 
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator';
-import { setTimeout } from 'timers';
 
-@Component
 import AuthenticationService from '../services/AuthenticationService'
 import UserService from '../services/UserService'
-import { constants } from 'http2';
 export default {
   data () {
     return {

@@ -75,7 +75,6 @@ import { Component, Prop, Vue } from 'vue-property-decorator';
 import AuthenticationService from '../services/AuthenticationService'
 import UserService from '../services/UserService'
 import MessageService from '../services/MessageService'
-import { constants } from 'http2';
 import io from 'socket.io-client/dist/socket.io'
 
 export default {

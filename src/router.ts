@@ -1,8 +1,8 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import Register from '@/views/Register'
-import Signin from '@/views/Signin'
-import Dashboard from '@/views/Dashboard'
+import Register from '@/views/Register.vue'
+import Signin from '@/views/Signin.vue'
+import Dashboard from '@/views/Dashboard.vue'
 
 Vue.use(Router);
 

@@ -1,11 +1,12 @@
 const express = require('express')
+const path = require('path')
 const bodyParser = require('body-parser')
 const morgan = require('morgan')
 const mongoose = require('mongoose')
 const user = require('./routes/user')
 const chat = require('./routes/chat')
 var Message = require('./models/Message.js')
-
+var User = require('./models/User')
 // Configuring the session
 const session = require('express-session')({
   secret: 'my-secret',
@@ -20,7 +21,9 @@ var sharedsession = require('express-socket.io-session')
 var storedsockets = {}
 var storedclients = {}
 
+app.use(express.static(path.join(__dirname, '..', '..', 'dist')))
 app.use(session)
+
 var server = require('http').createServer(app)
 
 var io = require('socket.io')(server)
@@ -63,6 +66,23 @@ app.use(function (req, res, next) {
 app.use('/user', user)
 app.use('/users', user)
 app.use('/chat', chat)
+
+app.get('/', function (req, res) {
+  res.sendFile(path.join(__dirname, '..', '..', 'dist', 'index.html'))
+})
+
+// Get all users
+app.get('/users', function (req, res, next) {
+  User.find({}, function (err, users) {
+    let userMap = []
+    users.forEach(function (user) {
+      userMap.push(user)
+    })
+    console.log(userMap)
+    res.send(userMap)
+    console.log(err)
+  })
+})
 
 app.post('/send/:to', function (req, res, next) {
   var sess = req.session

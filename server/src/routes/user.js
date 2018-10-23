@@ -59,25 +59,11 @@ router.get('/logout', function (req, res) {
 // Check if a user is still logeedin
 router.get('/isloggedin', function (req, res, next) {
   let sess = req.session
-  // res.json(sess)
-  // console.log(sess.user)
+  console.log('session data' + JSON.stringify(sess))
   if (!sess.user) {
     res.status(400)
     res.send('False')
   } else res.send(sess.user)
-})
-
-// Get all users
-router.get('/', function (req, res, next) {
-  User.find({}, function (err, users) {
-    let userMap = []
-    users.forEach(function (user) {
-      userMap.push(user)
-    })
-    console.log(userMap)
-    res.send(userMap)
-    console.log(err)
-  })
 })
 
 module.exports = router
