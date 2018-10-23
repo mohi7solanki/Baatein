@@ -8,6 +8,7 @@ export default {
     return Api()
     .post('user/signin', credentials)
     .then(function (resp) {
+      console.log(resp)
       return resp
     })
   },

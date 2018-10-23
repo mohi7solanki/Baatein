@@ -19,6 +19,7 @@
         </md-card-content>
         <hr>
         <md-card-actions>
+          <md-button @click="login">Login</md-button>
           <md-button @click="register">Register</md-button>
         </md-card-actions>
       </md-card>
@@ -31,10 +32,8 @@
 
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator';
-import { setTimeout } from 'timers';
 
-@Component
-import AuthenticationService from '@/services/AuthenticationService'
+import AuthenticationService from '../services/AuthenticationService'
 export default {
   data () {
     return {
@@ -79,6 +78,9 @@ export default {
           this.snackbarMessage = 'There was some error while registering'
         }
       }
+    },
+    login() {
+      this.$router.push({name: 'signin'})
     }
   }
 }
