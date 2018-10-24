@@ -171,7 +171,7 @@ export default {
 
     // Socket connection initialization on opening a chat window
     connectsocket(){
-      this.socket = io('http://localhost:4000')
+      this.socket = io.connect()
       this.socket.on('connect', function(){
         console.log('connect')
       });

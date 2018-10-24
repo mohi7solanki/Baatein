@@ -4,15 +4,15 @@ self.__precacheManifest = [
     "url": "/robots.txt"
   },
   {
-    "revision": "aca65904466e3ad849f9",
-    "url": "/js/chunk-vendors.0616e108.js"
+    "revision": "cc25f886d533b4f35fff",
+    "url": "/js/chunk-vendors.13646df5.js"
   },
   {
-    "revision": "b5eeee08a04f62a6b7f3",
-    "url": "/js/app.e62edcee.js"
+    "revision": "6830011f9a113c6cab83",
+    "url": "/js/app.2ebba5dc.js"
   },
   {
-    "revision": "12744b9da6601cd3c2324d0bfee0bc07",
+    "revision": "0d271dcd7fbc0bd02aca1fe11381caa4",
     "url": "/index.html"
   },
   {
@@ -24,11 +24,11 @@ self.__precacheManifest = [
     "url": "/img/leaves.203aa84f.png"
   },
   {
-    "revision": "aca65904466e3ad849f9",
+    "revision": "cc25f886d533b4f35fff",
     "url": "/css/chunk-vendors.00c394d1.css"
   },
   {
-    "revision": "b5eeee08a04f62a6b7f3",
-    "url": "/css/app.9fee1573.css"
+    "revision": "6830011f9a113c6cab83",
+    "url": "/css/app.f7f80d70.css"
   }
 ];

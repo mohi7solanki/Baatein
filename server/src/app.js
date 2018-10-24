@@ -7,6 +7,7 @@ const user = require('./routes/user')
 const chat = require('./routes/chat')
 var Message = require('./models/Message.js')
 var User = require('./models/User')
+
 // Configuring the session
 const session = require('express-session')({
   secret: 'my-secret',
@@ -16,6 +17,8 @@ const session = require('express-session')({
 })
 
 const app = express()
+var server = require('http').createServer(app)
+var io = require('socket.io')(server)
 
 var sharedsession = require('express-socket.io-session')
 var storedsockets = {}
@@ -23,10 +26,6 @@ var storedclients = {}
 
 app.use(express.static(path.join(__dirname, '..', '..', 'dist')))
 app.use(session)
-
-var server = require('http').createServer(app)
-
-var io = require('socket.io')(server)
 
 io.use(sharedsession(session, {
   autoSave: true
@@ -46,7 +45,11 @@ io.on('connection', function (socket) {
     }
   })
 })
-server.listen(4000)
+// server.listen(process.ENV.port || 3000)
+
+// Heroku setting for long polling - assuming io is the Socket.IO server object
+// io.set('transports', ['xhr-polling'])
+// io.set('polling duration', 10)
 
 // Logging request details
 app.use(morgan('combined'))
@@ -56,7 +59,7 @@ app.use(bodyParser.json())
 
 // Allow cors
 app.use(function (req, res, next) {
-  res.header('Access-Control-Allow-Origin', 'http://localhost:8080')
+  res.header('Access-Control-Allow-Origin', 'https://mevn-chat.herokuapp.com')
   res.header('Access-Control-Allow-Credentials', 'true')
   res.header('Access-Control-Allow-Methods', 'GET, POST, PATCH, PUT, DELETE, OPTIONS')
   res.header('Access-Control-Allow-Headers', 'Origin, Content-Type, X-Auth-Token')
@@ -109,7 +112,7 @@ app.post('/send/:to', function (req, res, next) {
 
 mongoose.Promise = global.Promise
 
-mongoose.connect('mongodb://localhost/mean-chat')
+mongoose.connect('mongodb://example:example@ds053312.mongolab.com:53312/todolist')
   .then(() => console.log('connection successful'))
   .catch((err) => console.error(err))
 
