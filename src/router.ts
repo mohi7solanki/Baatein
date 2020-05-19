@@ -4,7 +4,7 @@ import Register from '@/views/Register.vue'
 import Signin from '@/views/Signin.vue'
 import Dashboard from '@/views/Dashboard.vue'
 
-Vue.use(Router);
+Vue.use(Router)
 
 export default new Router({
   mode: 'history',
